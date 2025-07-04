@@ -1,31 +1,41 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from './api';
+import { useAuth } from '../../context/AuthContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     if (!email || !password) {
       setError('Please fill in all fields.');
       return;
     }
     setLoading(true);
     try {
-      const res = await authApi.login({ email, password });
-      if (res && res.success) {
-        navigate('/profile');
+      const response = await authApi.login({ email, password });
+      if (response.success && response.token) {
+        login(response.token, {
+          id: response.user.id,
+          username: response.user.username,
+          email: response.user.email
+        });
+        setSuccess('Login successful! Redirecting to profile...');
+        setTimeout(() => navigate('/profile'), 1200);
       } else {
-        setError(res?.message || 'Invalid credentials');
+        setError(response.message || 'Invalid credentials');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -57,6 +67,7 @@ const Login: React.FC = () => {
             />
           </div>
           {error && <div className="text-red-500 text-sm">{error}</div>}
+          {success && <div className="text-green-600 text-sm">{success}</div>}
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
