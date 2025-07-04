@@ -8,6 +8,15 @@ import PostList from '../components/posts/PostList';
 import Feed from '../components/feed/Feed';
 import JobList from '../components/job-board/JobList';
 import MessageList from '../components/messaging/MessageList';
+import Layout from '../components/layout/Layout';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import { Outlet } from 'react-router-dom';
+
+const LayoutWithOutlet = () => (
+  <Layout>
+    <Outlet />
+  </Layout>
+);
 
 export const router = createBrowserRouter([
   {
@@ -23,27 +32,36 @@ export const router = createBrowserRouter([
     element: <Signup />,
   },
   {
-    path: '/profile',
-    element: <ProfileView />,
-  },
-  {
-    path: '/profile/edit',
-    element: <ProfileEdit />,
-  },
-  {
-    path: '/posts/create',
-    element: <PostCreate />,
-  },
-  {
-    path: '/posts',
-    element: <PostList />,
-  },
-  {
-    path: '/jobs',
-    element: <JobList />,
-  },
-  {
-    path: '/messages',
-    element: <MessageList />,
+    element: <ProtectedRoute><LayoutWithOutlet /></ProtectedRoute>,
+    children: [
+      {
+        path: '/profile',
+        element: <ProfileView />,
+      },
+      {
+        path: '/profile/edit',
+        element: <ProfileEdit />,
+      },
+      {
+        path: '/posts/create',
+        element: <PostCreate />,
+      },
+      {
+        path: '/posts',
+        element: <PostList />,
+      },
+      {
+        path: '/feed',
+        element: <Feed />,
+      },
+      {
+        path: '/jobs',
+        element: <JobList />,
+      },
+      {
+        path: '/messages',
+        element: <MessageList />,
+      },
+    ],
   },
 ]); 

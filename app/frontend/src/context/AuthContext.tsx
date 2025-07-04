@@ -1,14 +1,18 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 
 interface User {
-  name: string;
+  id: number;
+  username: string;
+  email: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: () => void;
+  isAuthenticated: boolean;
+  login: (token: string, userData: User) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -19,12 +23,37 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = () => setUser({ name: 'Demo User' });
-  const logout = () => setUser(null);
+  // Check for existing token on app load
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // You could verify the token here by making an API call
+      // For now, we'll just check if it exists
+      setUser({ id: 1, username: 'User', email: 'user@example.com' }); // Placeholder
+    }
+    setLoading(false);
+  }, []);
+
+  const login = (token: string, userData: User) => {
+    localStorage.setItem('token', token);
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      login, 
+      logout, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
