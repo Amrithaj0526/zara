@@ -1,11 +1,12 @@
-from flask import Flask, jsonify
-from app.backend.config import Config
-from app.backend.extensions import db, migrate, jwt
-from app.backend.api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
+from flask import Flask, jsonify, send_from_directory
+from config import Config
+from extensions import db, migrate, jwt
+from api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
+from models.profile import Profile
 
 # Instantiate Limiter globally
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
@@ -20,7 +21,7 @@ def create_app():
     jwt.init_app(app)
     CORS(
         app,
-        origins=["http://localhost:5173"],
+        origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000"],
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
@@ -42,6 +43,11 @@ def create_app():
             }
         })
 
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../../uploads')
+    @app.route('/uploads/<filename>')
+    def uploaded_file(filename):
+        return send_from_directory(UPLOAD_FOLDER, filename)
+
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(profile_bp, url_prefix='/profile')
@@ -52,7 +58,7 @@ def create_app():
 
     # Import models inside app context for migrations
     with app.app_context():
-        from app.backend.models.user import User
+        from models.user import User
         # Import other models as needed
 
     return app

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.backend.extensions import db, jwt
-from app.backend.models.user import User
+from extensions import db, jwt
+from models.user import User
 from flask_jwt_extended import create_access_token
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -65,7 +65,7 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({'message': 'Invalid credentials'}), 401
 
-    token = create_access_token(identity=user.id)
+    token = create_access_token(identity=str(user.id))
     return jsonify({
         'success': True,
         'token': token,
