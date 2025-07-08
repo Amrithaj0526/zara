@@ -13,11 +13,11 @@ export const api = {
   // Auth endpoints
   login: async (credentials: { email: string; password: string }) => {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    });
       
       const data = await response.json();
       
@@ -34,11 +34,11 @@ export const api = {
 
   signup: async (userData: { email: string; password: string; username: string }) => {
     try {
-      const response = await fetch(`${API_URL}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
+    const response = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
       
       const data = await response.json();
       
@@ -56,9 +56,9 @@ export const api = {
   // Profile endpoints
   getProfile: async () => {
     try {
-      const response = await fetch(`${API_URL}/profile`, {
+    const response = await fetch(`${API_URL}/profile`, {
         headers: getAuthHeaders(),
-      });
+    });
       
       const data = await response.json();
       
@@ -75,11 +75,11 @@ export const api = {
 
   updateProfile: async (profileData: any) => {
     try {
-      const response = await fetch(`${API_URL}/profile`, {
-        method: 'PUT',
+    const response = await fetch(`${API_URL}/profile`, {
+      method: 'PUT',
         headers: getAuthHeaders(),
-        body: JSON.stringify(profileData),
-      });
+      body: JSON.stringify(profileData),
+    });
       
       const data = await response.json();
       

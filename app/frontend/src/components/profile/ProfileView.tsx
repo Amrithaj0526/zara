@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { profileApi } from './api';
+import { FaUser, FaMapMarkerAlt, FaTools, FaBriefcase, FaGraduationCap, FaInfoCircle } from 'react-icons/fa';
 
 interface Profile {
   id: number;
@@ -75,67 +76,65 @@ const ProfileView: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Profile</h1>
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-extrabold text-blue-700 flex items-center gap-2"><FaUser className="inline-block text-blue-400" /> Profile</h1>
           <button 
             onClick={() => window.location.href = '/profile/edit'}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow"
           >
             Edit Profile
           </button>
         </div>
 
         {profile ? (
-          <div className="space-y-6">
-            {/* Profile Image */}
-            <div className="flex items-center space-x-4">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+          <div className="space-y-8">
+            {/* Profile Image and Basic Info */}
+            <div className="flex items-center space-x-8">
+              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 border-blue-200 shadow">
                 {profile.image ? (
                   <img 
                     src={`http://localhost:5000${profile.image}`}
                     alt="Profile" 
-                    className="w-24 h-24 rounded-full object-cover"
+                    className="w-32 h-32 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="text-gray-400 text-2xl">
-                    {profile.user?.username?.charAt(0).toUpperCase() || 'U'}
-                  </div>
+                  <FaUser className="text-gray-400 text-6xl" />
                 )}
               </div>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  {profile.user?.username || 'Username'}
+                <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                  <FaUser className="text-blue-400" /> {profile.user?.username || 'Username'}
                 </h2>
-                <p className="text-gray-600">{profile.user?.email || 'email@example.com'}</p>
+                <p className="text-gray-600 flex items-center gap-2"><FaInfoCircle className="text-blue-300" /> {profile.user?.email || 'email@example.com'}</p>
               </div>
             </div>
 
             {/* Bio */}
             {profile.bio && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Bio</h3>
-                <p className="text-gray-700 bg-gray-50 p-3 rounded">{profile.bio}</p>
+                <h3 className="text-xl font-semibold text-blue-600 flex items-center gap-2 mb-2"><FaInfoCircle /> Bio</h3>
+                <p className="text-gray-700 bg-blue-50 p-4 rounded shadow-inner">{profile.bio}</p>
               </div>
             )}
 
             {/* Location */}
             {profile.location && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Location</h3>
-                <p className="text-gray-700 bg-gray-50 p-3 rounded">{profile.location}</p>
+                <h3 className="text-xl font-semibold text-blue-600 flex items-center gap-2 mb-2"><FaMapMarkerAlt /> Location</h3>
+                <p className="text-gray-700 bg-blue-50 p-4 rounded shadow-inner">{profile.location}</p>
               </div>
             )}
 
             {/* Skills */}
             {profile.skills && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Skills</h3>
-                <div className="bg-gray-50 p-3 rounded">
+                <h3 className="text-xl font-semibold text-blue-600 flex items-center gap-2 mb-2"><FaTools /> Skills</h3>
+                <div className="bg-blue-50 p-4 rounded shadow-inner flex flex-wrap gap-2">
                   {profile.skills.split(',').map((skill, index) => (
                     <span 
                       key={index}
-                      className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2 mb-2"
+                      className="inline-block bg-blue-200 text-blue-900 px-3 py-1 rounded-full font-semibold shadow"
                     >
                       {skill.trim()}
                     </span>
@@ -147,8 +146,8 @@ const ProfileView: React.FC = () => {
             {/* Experience */}
             {profile.experience && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Experience</h3>
-                <div className="bg-gray-50 p-3 rounded">
+                <h3 className="text-xl font-semibold text-blue-600 flex items-center gap-2 mb-2"><FaBriefcase /> Experience</h3>
+                <div className="bg-blue-50 p-4 rounded shadow-inner">
                   <pre className="whitespace-pre-wrap text-gray-700">{profile.experience}</pre>
                 </div>
               </div>
@@ -157,8 +156,8 @@ const ProfileView: React.FC = () => {
             {/* Education */}
             {profile.education && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Education</h3>
-                <div className="bg-gray-50 p-3 rounded">
+                <h3 className="text-xl font-semibold text-blue-600 flex items-center gap-2 mb-2"><FaGraduationCap /> Education</h3>
+                <div className="bg-blue-50 p-4 rounded shadow-inner">
                   <pre className="whitespace-pre-wrap text-gray-700">{profile.education}</pre>
                 </div>
               </div>

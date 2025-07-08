@@ -1,24 +1,31 @@
 from flask import Blueprint, request, jsonify
-from extensions import db, jwt
-from models.user import User
+from app.backend.extensions import db, jwt
+from app.backend.models.user import User
 from flask_jwt_extended import create_access_token
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import re
 from markupsafe import escape
+from app.backend.models.profile import Profile
 
 # Attach limiter to blueprint
 limiter = Limiter(key_func=get_remote_address)
 
 auth_bp = Blueprint('auth', __name__)
-
+ 
 PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$')
+
+def get_request_data():
+    if request.is_json:
+        return request.get_json()
+    else:
+        return request.form
 
 @auth_bp.route('/signup', methods=['POST'])
 @limiter.limit("5 per minute")
 def signup():
     try:
-        data = request.get_json()
+        data = get_request_data()
         if not data:
             return jsonify({'message': 'No JSON data provided'}), 400
         
@@ -43,6 +50,16 @@ def signup():
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
+
+        profile = Profile(
+            user_id=user.id,
+            first_name='Test',
+            last_name='User',
+            bio='Auto-created profile'
+        )
+        db.session.add(profile)
+        db.session.commit()
+
         return jsonify({'message': 'User created successfully'}), 201
         
     except Exception as e:
@@ -53,7 +70,7 @@ def signup():
 @auth_bp.route('/login', methods=['POST'])
 @limiter.limit("10 per minute")
 def login():
-    data = request.get_json()
+    data = get_request_data()
     identifier = escape(data.get('username') or data.get('email', '')).strip()
     password = data.get('password', '')
 

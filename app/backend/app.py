@@ -1,12 +1,12 @@
 from flask import Flask, jsonify, send_from_directory
-from config import Config
-from extensions import db, migrate, jwt
-from api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
+from app.backend.config import Config
+from app.backend.extensions import db, migrate, jwt
+from app.backend.api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
-from models.profile import Profile
+from app.backend.models.profile import Profile
 
 # Instantiate Limiter globally
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
@@ -58,7 +58,7 @@ def create_app():
 
     # Import models inside app context for migrations
     with app.app_context():
-        from models.user import User
+        from app.backend.models.user import User
         # Import other models as needed
 
     return app

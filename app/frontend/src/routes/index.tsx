@@ -34,34 +34,47 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute><LayoutWithOutlet /></ProtectedRoute>,
     children: [
-      {
-        path: '/profile',
-        element: <ProfileView />,
-      },
-      {
-        path: '/profile/edit',
-        element: <ProfileEdit />,
-      },
-      {
-        path: '/posts/create',
-        element: <PostCreate />,
-      },
-      {
-        path: '/posts',
-        element: <PostList />,
-      },
+  {
+    path: '/profile',
+    element: <ProfileView />,
+  },
+  {
+    path: '/profile/edit',
+    element: <ProfileEdit />,
+  },
+  {
+    path: '/posts/create',
+    element: <PostCreate />,
+  },
+  {
+    path: '/posts',
+    element: <PostList />,
+  },
       {
         path: '/feed',
         element: <Feed />,
       },
       {
-        path: '/jobs',
-        element: <JobList />,
+        path: '/posts/create',
+        element: <PostCreate />,
       },
-      {
-        path: '/messages',
-        element: <MessageList />,
+  {
+    path: '/jobs',
+    element: <JobList />,
+  },
+  {
+    path: '/messages',
+    element: <MessageList />,
       },
     ],
   },
-]); 
+]);
+
+export default function Routes() {
+  return (
+    <div>
+      <PostCreate />
+      <PostList />
+    </div>
+  );
+} 

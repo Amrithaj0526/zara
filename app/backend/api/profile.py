@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models.profile import Profile
-from models.user import User
+from app.backend.extensions import db
+from app.backend.models.profile import Profile
+from app.backend.models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from markupsafe import escape
 from werkzeug.utils import secure_filename
@@ -10,7 +10,7 @@ import time
 import os
 
 profile_bp = Blueprint('profile', __name__)
-
+ 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../../../uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
@@ -34,6 +34,21 @@ def create_thumbnail(image, thumb_path):
     img.save(thumb_path, optimize=True, quality=70)
     return thumb_path
 
+def serialize_profile(profile):
+    return {
+        'id': profile.id,
+        'user_id': profile.user_id,
+        'first_name': profile.first_name,
+        'last_name': profile.last_name,
+        'skills': profile.skills,
+        'experience': profile.experience,
+        'education': profile.education,
+        'image': profile.image,
+        'job_title': profile.job_title,
+        'company': profile.company,
+        'social_links': profile.social_links,
+    }
+
 @profile_bp.route('', methods=['GET'])
 @profile_bp.route('/', methods=['GET'])
 @jwt_required()
@@ -50,8 +65,8 @@ def get_profile():
         profile = Profile.query.filter_by(user_id=user_id).first()
         
         if not profile:
-            # Create empty profile if it doesn't exist
-            profile = Profile(user_id=user_id)
+            # Create profile with default names if it doesn't exist
+            profile = Profile(user_id=user_id, first_name='First', last_name='Last')
             db.session.add(profile)
             db.session.commit()
         
@@ -90,10 +105,14 @@ def update_profile():
         # Get or create profile
         profile = Profile.query.filter_by(user_id=user_id).first()
         if not profile:
-            profile = Profile(user_id=user_id)
+            profile = Profile(user_id=user_id, first_name='First', last_name='Last')
             db.session.add(profile)
         
         # Update profile fields
+        if 'first_name' in data:
+            profile.first_name = escape(data['first_name'][:80]) if data['first_name'] else None
+        if 'last_name' in data:
+            profile.last_name = escape(data['last_name'][:80]) if data['last_name'] else None
         if 'bio' in data:
             profile.bio = escape(data['bio'][:500]) if data['bio'] else None
         if 'location' in data:
@@ -104,26 +123,27 @@ def update_profile():
             profile.experience = escape(data['experience']) if data['experience'] else None
         if 'education' in data:
             profile.education = escape(data['education']) if data['education'] else None
-        
-        # Validate profile
-        validation_errors = profile.validate()
-        if validation_errors:
-            return jsonify({'message': 'Validation failed', 'errors': validation_errors}), 400
+        if 'job_title' in data:
+            profile.job_title = escape(data['job_title'][:100]) if data['job_title'] else None
+        if 'company' in data:
+            profile.company = escape(data['company'][:100]) if data['company'] else None
+        if 'social_links' in data:
+            profile.social_links = escape(data['social_links']) if data['social_links'] else None
+
+        # Remove validation call
+        # validation_errors = profile.validate()
+        # if validation_errors:
+        #     return jsonify({'message': 'Validation failed', 'errors': validation_errors}), 400
+
+        # Ensure first_name and last_name are present
+        if not profile.first_name or not profile.last_name:
+            return jsonify({'message': 'First name and last name are required.'}), 400
         
         db.session.commit()
         
         return jsonify({
             'message': 'Profile updated successfully',
-            'profile': {
-                'id': profile.id,
-                'user_id': profile.user_id,
-                'bio': profile.bio,
-                'location': profile.location,
-                'skills': profile.skills,
-                'experience': profile.experience,
-                'education': profile.education,
-                'image': profile.image
-            }
+            'profile': serialize_profile(profile)
         }), 200
         
     except Exception as e:
@@ -168,7 +188,7 @@ def upload_profile_image():
     if 'image' not in request.files:
         return jsonify({'message': 'No image file provided'}), 400
     file = request.files['image']
-    if file.filename == '':
+    if not file.filename or '.' not in file.filename:
         return jsonify({'message': 'No selected file'}), 400
     if not allowed_file(file.filename):
         return jsonify({'message': 'Invalid file type. Only jpg, jpeg, png allowed.'}), 400
@@ -195,7 +215,7 @@ def upload_profile_image():
     # Update profile
     profile = Profile.query.filter_by(user_id=user_id).first()
     if not profile:
-        profile = Profile(user_id=user_id)
+        profile = Profile(user_id=user_id, first_name='First', last_name='Last')
         db.session.add(profile)
     profile.image = f"/uploads/{filename}"
     db.session.commit()
