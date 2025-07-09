@@ -28,7 +28,7 @@ def main():
     print("=" * 50)
     
     # Start the server
-    subprocess.run([venv_python, "main.py"])
+    subprocess.run([venv_python, "-m", "flask", "run", "--host=0.0.0.0", "--port=5000", "--debug"])
 
 if __name__ == "__main__":
     main() 

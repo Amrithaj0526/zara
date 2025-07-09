@@ -1,15 +1,25 @@
-from flask import Flask, jsonify, send_from_directory
-from app.backend.config import Config
-from app.backend.extensions import db, migrate, jwt
-from app.backend.api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
+from flask import Flask, jsonify, send_from_directory, request
+from config import Config
+from extensions import db, migrate, jwt
+from api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
-from app.backend.models.profile import Profile
+from models.profile import Profile
 
-# Instantiate Limiter globally
-limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
+# Set a high rate limit for development. Adjust for production as needed.
+limiter = Limiter(key_func=get_remote_address, default_limits=["5000 per day", "1000 per hour"])
+
+@limiter.request_filter
+def ip_whitelist():
+    # Allow all OPTIONS requests (CORS preflight) to bypass rate limiting
+    if request.method == "OPTIONS":
+        return True
+    # Exclude uploads/media/static files from rate limiting
+    if request.path.startswith('/uploads/') or request.path.startswith('/posts/uploads/'):
+        return True
+    return False
 
 def create_app():
     app = Flask(__name__)
@@ -21,7 +31,12 @@ def create_app():
     jwt.init_app(app)
     CORS(
         app,
-        origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000"],
+        origins=[
+            r"http://localhost:\d+",
+            r"http://127.0.0.1:\d+",
+            "http://localhost:3000",
+            "http://localhost:8080"
+        ],
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
@@ -48,6 +63,10 @@ def create_app():
     def uploaded_file(filename):
         return send_from_directory(UPLOAD_FOLDER, filename)
 
+    @app.route('/posts/uploads/<filename>')
+    def post_uploaded_file(filename):
+        return send_from_directory(UPLOAD_FOLDER, filename)
+
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(profile_bp, url_prefix='/profile')
@@ -56,9 +75,22 @@ def create_app():
     app.register_blueprint(jobs_bp, url_prefix='/jobs')
     app.register_blueprint(messaging_bp, url_prefix='/messaging')
 
+    # Error handler to ensure CORS headers are added to error responses
+    @app.errorhandler(500)
+    def internal_error(error):
+        response = jsonify({'error': 'Internal server error'})
+        response.status_code = 500
+        return response
+
+    @app.errorhandler(404)
+    def not_found(error):
+        response = jsonify({'error': 'Not found'})
+        response.status_code = 404
+        return response
+
     # Import models inside app context for migrations
     with app.app_context():
-        from app.backend.models.user import User
+        from models.user import User
         # Import other models as needed
 
     return app

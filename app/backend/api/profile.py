@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app.backend.extensions import db
-from app.backend.models.profile import Profile
-from app.backend.models.user import User
+from extensions import db
+from models.profile import Profile
+from models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from markupsafe import escape
 from werkzeug.utils import secure_filename
