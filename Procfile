@@ -1,1 +1,1 @@
-web: cd app/backend && gunicorn main:app --bind 0.0.0.0:$PORT 
+web: cd app/backend && ./start.sh 
