@@ -70,7 +70,7 @@ const PostCreate: React.FC = () => {
   const [media, setMedia] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // Restored error state
   const [success, setSuccess] = useState(false);
   const [category, setCategory] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
