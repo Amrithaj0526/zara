@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { FaUserCircle, FaCalendarAlt, FaRegHeart, FaHeart, FaRegCommentDots, FaTag, FaEllipsisH, FaSearch, FaSortAmountDown, FaSortAmountUp, FaShareAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
@@ -54,17 +54,18 @@ interface Post {
   comments: Comment[];
 }
 
+// For type safety
+type RequestInit = globalThis.RequestInit;
+
 const PostList: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [sort, setSort] = useState('created_at');
+  const [sort] = useState('created_at');
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const debouncedSearch = useDebounce(search, 500);
   const [expandedComments, setExpandedComments] = useState<{ [key: number]: boolean }>({});
@@ -99,14 +100,14 @@ const PostList: React.FC = () => {
     }
     
     const token = localStorage.getItem('token');
-    const headers: HeadersInit = {
+    const headers: RequestInit['headers'] = {
       'Content-Type': 'application/json',
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
     
-    fetch(`http://localhost:5000/posts/?${params}`, {
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/?${params}`, {
       headers,
       credentials: 'include'
     })
@@ -117,10 +118,8 @@ const PostList: React.FC = () => {
         } else {
           setPosts(prev => [...prev, ...data.posts]);
         }
-        setTotal(data.total);
-        setHasMore(data.posts.length > 0 && posts.length + data.posts.length < data.total);
       })
-      .catch(err => setError('Failed to load posts'))
+      .catch(() => setError('Failed to load posts'))
       .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [debouncedSearch, category, sort, order, page, tagsFilter, myPostsOnly, user?.id]);
@@ -128,18 +127,18 @@ const PostList: React.FC = () => {
   // Fetch categories
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const headers: HeadersInit = {
+    const headers: RequestInit['headers'] = {
       'Content-Type': 'application/json',
     };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
     
-    fetch('http://localhost:5000/posts/categories', { headers })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/categories`, { headers })
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(() => setCategories([]));
-    fetch('http://localhost:5000/posts/popular-tags', { headers })
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/popular-tags`, { headers })
       .then(res => res.json())
       .then(data => setPopularTags(data))
       .catch(() => setPopularTags([]));
@@ -147,22 +146,22 @@ const PostList: React.FC = () => {
 
   // Infinite scroll
   const loadMore = () => {
-    if (!loading && hasMore) setPage(p => p + 1);
+    if (!loading) setPage(p => p + 1);
   };
-  const lastPostRef = useInfiniteScroll(loadMore, hasMore, loading);
+  const lastPostRef = useInfiniteScroll(loadMore, true, loading);
 
   const handleLike = async (postId: number) => {
     setLikeLoading(l => ({ ...l, [postId]: true }));
     try {
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {
+      const headers: RequestInit['headers'] = {
         'Content-Type': 'application/json',
       };
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const res = await fetch(`http://localhost:5000/posts/${postId}/like`, { 
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/${postId}/like`, { 
         method: 'POST', 
         headers,
         credentials: 'include' 
@@ -190,14 +189,13 @@ const PostList: React.FC = () => {
     setCommentError(e => ({ ...e, [postId]: null }));
     try {
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {
+      const headers: RequestInit['headers'] = {
         'Content-Type': 'application/json',
       };
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      
-      const res = await fetch(`http://localhost:5000/posts/${postId}/comments`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/${postId}/comments`, {
         method: 'POST',
         headers,
         credentials: 'include',
@@ -208,7 +206,7 @@ const PostList: React.FC = () => {
         throw new Error(data.error || 'Failed to add comment');
       }
       // Refetch comments for this post
-      const commentsRes = await fetch(`http://localhost:5000/posts/${postId}/comments`, {
+      const commentsRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/${postId}/comments`, {
         headers: {
           'Content-Type': 'application/json',
           ...(token && { 'Authorization': `Bearer ${token}` })
@@ -218,8 +216,8 @@ const PostList: React.FC = () => {
       setPosts(posts => posts.map(p => p.id === postId ? { ...p, comments } : p));
       setCommentInputs(inputs => ({ ...inputs, [postId]: '' }));
       if (commentRefs.current[postId]) commentRefs.current[postId]!.value = '';
-    } catch (err: any) {
-      setCommentError(e => ({ ...e, [postId]: err.message }));
+    } catch (error: any) {
+      setCommentError(e => ({ ...e, [postId]: error.message }));
     } finally {
       setCommentLoading(l => ({ ...l, [postId]: false }));
     }

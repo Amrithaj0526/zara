@@ -32,7 +32,9 @@ test('signup, login, and create post with text and image', async ({ page }) => {
   await page.fill('textarea', 'Automated test post with image!');
 
   // Upload image
-  const filePath = path.resolve(__dirname, '../../../test_image.jpg');
+  // Use import.meta.url for file path in ESM
+  // eslint-disable-next-line no-undef
+  const filePath = path.join(new URL('.', import.meta.url).pathname, 'test-image.jpg');
   await page.setInputFiles('input[type="file"]', filePath);
 
   // Submit

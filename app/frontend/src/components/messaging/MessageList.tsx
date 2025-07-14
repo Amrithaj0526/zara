@@ -22,7 +22,7 @@ const peopleSuggestions = [
 
 const MessageList: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState(users[0]);
-  const [messages, setMessages] = useState(demoMessages);
+  const [messages] = useState(demoMessages);
   const [input, setInput] = useState('');
 
   return (

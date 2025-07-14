@@ -10,7 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (token: string, userData: User) => void;
+  login: (arg0: string, arg1: User) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -36,9 +36,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token);
-    setUser(userData);
+  // eslint-disable-next-line no-unused-vars
+  const login = (_token: string, _userData: User) => {
+    localStorage.setItem('token', _token);
+    setUser(_userData);
   };
 
   const logout = () => {

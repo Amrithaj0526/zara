@@ -51,6 +51,9 @@ const demoStats = [
   { label: 'Search Appearances', value: 312 },
 ];
 
+// For type safety
+type RequestInit = globalThis.RequestInit;
+
 const ProfileView: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,13 +83,13 @@ const ProfileView: React.FC = () => {
     if (user?.id) {
       setPostsLoading(true);
       const token = localStorage.getItem('token');
-      const headers: HeadersInit = {
+      const headers: RequestInit['headers'] = {
         'Content-Type': 'application/json',
       };
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      fetch(`http://localhost:5000/posts/?user_id=${user.id}`, { headers })
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/posts/?user_id=${user.id}`, { headers })
         .then(res => res.json())
         .then(data => {
           setMyPosts(data.posts || []);

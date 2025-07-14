@@ -87,7 +87,7 @@ const ProfileEdit: React.FC = () => {
       } else {
         setImageUploadError(res?.message || 'Image upload failed');
       }
-    } catch (err) {
+    } catch {
       setImageUploadError('Image upload failed');
     } finally {
       setImageUploading(false);
@@ -106,9 +106,8 @@ const ProfileEdit: React.FC = () => {
       setTimeout(() => {
         window.location.href = '/profile';
       }, 1500);
-    } catch (err) {
+    } catch {
       setError('Failed to update profile');
-      console.error('Profile update error:', err);
     } finally {
       setLoading(false);
     }
