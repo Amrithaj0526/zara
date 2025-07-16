@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify, current_app, url_for
-from extensions import db
-from models.post import Post
-from models.user import User
+from app.backend.extensions import db
+from app.backend.models.post import Post
+from app.backend.models.user import User
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models.comment import Comment
-from models.profile import Profile
+from app.backend.models.comment import Comment
+from app.backend.models.profile import Profile
 from sqlalchemy import desc, asc, func
 from functools import lru_cache
 

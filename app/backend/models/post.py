@@ -1,6 +1,6 @@
 from datetime import datetime
-from extensions import db
-from models.user import User
+from app.backend.extensions import db
+from app.backend.models.user import User
 
 class Post(db.Model):
     __table_args__ = {'extend_existing': True}

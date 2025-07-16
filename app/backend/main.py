@@ -1,7 +1,7 @@
 """
 Main application entry point for development and production
 """
-from app import create_app
+from app.backend.app import create_app
 
 # Create the Flask app instance for gunicorn
 app = create_app()

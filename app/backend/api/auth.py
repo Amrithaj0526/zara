@@ -1,12 +1,12 @@
 from flask import Blueprint, request, jsonify
-from extensions import db, jwt
-from models.user import User
+from app.backend.extensions import db, jwt
+from app.backend.models.user import User
 from flask_jwt_extended import create_access_token
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import re
 from markupsafe import escape
-from models.profile import Profile
+from app.backend.models.profile import Profile
 
 # Attach limiter to blueprint
 limiter = Limiter(key_func=get_remote_address)

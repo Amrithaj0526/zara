@@ -1,4 +1,4 @@
-from extensions import db
+from app.backend.extensions import db
 
 class Job(db.Model):
     __table_args__ = {'extend_existing': True}
