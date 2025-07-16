@@ -30,15 +30,13 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
     
-    # CORS configuration with environment variables
-    ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,https://your-frontend-url.onrender.com').split(',')
-    
+    # CORS configuration with explicit allowed origins
     CORS(
         app,
-        origins=ALLOWED_ORIGINS,
-        methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
+        origins=["http://localhost:5173", "http://127.0.0.1:5173"],
         supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         max_age=3600
     )
     limiter.init_app(app)

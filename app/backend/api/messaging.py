@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.backend.extensions import db
+from app.backend.models.message import Message
 from app.backend.models.user import User
 
 messaging_bp = Blueprint('messaging', __name__)
