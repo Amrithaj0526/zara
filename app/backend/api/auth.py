@@ -26,6 +26,7 @@ def get_request_data():
 def signup():
     try:
         data = get_request_data()
+        print("Received signup data:", data)
         if not data:
             return jsonify({'message': 'No JSON data provided'}), 400
         
@@ -63,7 +64,8 @@ def signup():
         return jsonify({'message': 'User created successfully'}), 201
         
     except Exception as e:
-        print(f"Signup error: {str(e)}")
+        print("Signup error:", e)
+        import traceback; traceback.print_exc()
         db.session.rollback()
         return jsonify({'message': 'Internal server error'}), 500
 
