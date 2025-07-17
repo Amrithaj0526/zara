@@ -18,7 +18,7 @@ class Config:
     MYSQL_HOST = os.environ.get('MYSQL_HOST', 'localhost')
     MYSQL_DB = os.environ.get('MYSQL_DB', 'PROK_DB')
     
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL or f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}"
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL or f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}?charset=utf8mb4"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT

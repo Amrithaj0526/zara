@@ -30,18 +30,14 @@ def create_app():
     migrate.init_app(app, db)
     jwt.init_app(app)
     
-    # CORS configuration with explicit allowed origins
+    # CORS configuration with flexible production origin support
+    ALLOWED_ORIGINS = os.getenv(
+        'ALLOWED_ORIGINS',
+        'http://localhost:3000,http://localhost:5173,http://localhost:5174,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,https://prok-frontend-s12g.onrender.com'
+    ).split(',')
     CORS(
         app,
-        origins=[
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://localhost:5174",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5173",
-            "http://127.0.0.1:5174",
-            "https://prok-frontend-s12g.onrender.com"
-        ],
+        origins=ALLOWED_ORIGINS,
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
