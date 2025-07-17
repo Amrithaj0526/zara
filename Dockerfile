@@ -14,9 +14,6 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy backend code (preserve app/ package structure)
 COPY app/ app/
 
-# Set workdir to where the app/ package is
-WORKDIR /app/app
-
 # Set environment variables
 ENV FLASK_APP=main.py
 ENV FLASK_RUN_HOST=0.0.0.0
