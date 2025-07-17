@@ -1,2 +1,2 @@
-from app.backend.app import create_app
+# This file marks the app directory as a Python package.
 

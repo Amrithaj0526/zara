@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, send_from_directory, request
-from app.backend.config import Config
+from .config import Config
 from app.backend.extensions import db, migrate, jwt
 from app.backend.api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
 from flask_cors import CORS
