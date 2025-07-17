@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y gcc libmariadb-dev pkg-config libjpeg-d
 COPY app/backend/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy backend code
-COPY app/backend/ .
+# Copy backend code (preserve app/ package structure)
+COPY app/ app/
 
 # Set environment variables
 ENV FLASK_APP=main.py
