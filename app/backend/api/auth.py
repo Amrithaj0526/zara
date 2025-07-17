@@ -72,27 +72,38 @@ def signup():
 @auth_bp.route('/login', methods=['POST'])
 @limiter.limit("10 per minute")
 def login():
-    data = get_request_data()
-    identifier = escape(data.get('username') or data.get('email', '')).strip()
-    password = data.get('password', '')
+    try:
+        data = get_request_data()
+        print("Received login data:", data)
+        identifier = escape(data.get('username') or data.get('email', '')).strip()
+        password = data.get('password', '')
 
-    if not identifier or not password:
-        return jsonify({'message': 'Missing username/email or password'}), 400
+        if not identifier or not password:
+            print("Login error: Missing username/email or password")
+            return jsonify({'message': 'Missing username/email or password'}), 400
 
-    # Allow login with either username or email
-    user = User.query.filter((User.username == identifier) | (User.email == identifier)).first()
-    if not user or not user.check_password(password):
-        return jsonify({'message': 'Invalid credentials'}), 401
+        # Allow login with either username or email
+        user = User.query.filter((User.username == identifier) | (User.email == identifier)).first()
+        if not user:
+            print(f"Login error: User not found for identifier '{identifier}'")
+            return jsonify({'message': 'User not found'}), 404
+        if not user.check_password(password):
+            print(f"Login error: Incorrect password for user '{identifier}'")
+            return jsonify({'message': 'Incorrect password'}), 401
 
-    token = create_access_token(identity=str(user.id))
-    return jsonify({
-        'success': True,
-        'token': token,
-        'user': {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email
-        }
-    }), 200
+        token = create_access_token(identity=str(user.id))
+        return jsonify({
+            'success': True,
+            'token': token,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            }
+        }), 200
+    except Exception as e:
+        print("Login error (exception):", e)
+        import traceback; traceback.print_exc()
+        return jsonify({'message': 'Internal server error'}), 500
 
 # Routes will be implemented here 
