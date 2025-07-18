@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, send_from_directory, request
-from .config import Config
+from app.backend.config import Config
 from app.backend.extensions import db, migrate, jwt
 from app.backend.api import auth_bp, profile_bp, posts_bp, feed_bp, jobs_bp, messaging_bp
 from flask_cors import CORS
@@ -33,7 +33,7 @@ def create_app():
     # CORS configuration with flexible production origin support
     ALLOWED_ORIGINS = os.getenv(
         'ALLOWED_ORIGINS',
-        'http://localhost:3000,http://localhost:5173,http://localhost:5174,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,https://prok-frontend-s12g.onrender.com'
+        'http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,https://prok-frontend-s12g.onrender.com'
     ).split(',')
     CORS(
         app,
@@ -103,4 +103,7 @@ def get_app():
     global _app
     if _app is None:
         _app = create_app()
-    return _app 
+    return _app
+
+# Expose the app object for Gunicorn
+app = create_app() 
