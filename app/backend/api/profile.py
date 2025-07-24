@@ -5,7 +5,6 @@ from app.backend.models.profile import Profile
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from markupsafe import escape
 from werkzeug.utils import secure_filename
-# from PIL import Image  # Temporarily commented out for deployment
 import time
 import os
 
@@ -14,7 +13,6 @@ profile_bp = Blueprint('profile', __name__)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../../../uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-THUMBNAIL_SIZE = (128, 128)
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -22,19 +20,13 @@ if not os.path.exists(UPLOAD_FOLDER):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def compress_and_save_image(image, save_path):
-    # Temporarily disabled for deployment
-    # img = Image.open(image)
-    # img = img.convert('RGB')
-    # img.save(save_path, optimize=True, quality=85)
+def save_image_simple(image, save_path):
+    """Simple image save without compression"""
     image.save(save_path)
     return save_path
 
-def create_thumbnail(image, thumb_path):
-    # Temporarily disabled for deployment
-    # img = Image.open(image)
-    # img.thumbnail(THUMBNAIL_SIZE)
-    # img.save(thumb_path, optimize=True, quality=70)
+def create_thumbnail_simple(image, thumb_path):
+    """Simple thumbnail save without compression"""
     image.save(thumb_path)
     return thumb_path
 
@@ -208,11 +200,11 @@ def upload_profile_image():
     save_path = os.path.join(UPLOAD_FOLDER, filename)
     # Save and compress image
     try:
-        compress_and_save_image(file, save_path)
+        save_image_simple(file, save_path)
         # Create thumbnail
         thumb_filename = f"thumb_{filename}"
         thumb_path = os.path.join(UPLOAD_FOLDER, thumb_filename)
-        create_thumbnail(file, thumb_path)
+        create_thumbnail_simple(file, thumb_path)
     except Exception as e:
         print(f"Image processing error: {str(e)}")
         return jsonify({'message': 'Image processing failed'}), 500
