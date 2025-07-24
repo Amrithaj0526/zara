@@ -13,4 +13,4 @@ services:
         sync: false
       - key: ALLOWED_ORIGINS
         sync: false
-    workingDir: . 
+    workingDir: zara 
