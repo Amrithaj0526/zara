@@ -20,7 +20,8 @@ zara/
 │   │   └── vite.config.ts      # Vite configuration
 │   └── uploads/                # File uploads directory
 ├── render.yaml                 # Render deployment configuration
-└── main.py                     # Root entry point for backend
+├── main.py                     # Root entry point for backend
+└── requirements.txt            # Root-level Python dependencies
 ```
 
 ## Application Components
@@ -30,7 +31,7 @@ zara/
 - **Database**: PostgreSQL (production) / MySQL (development)
 - **Authentication**: JWT tokens
 - **Features**: User auth, posts, feed, jobs, messaging, file uploads
-- **Entry Point**: `app/backend/main.py`
+- **Entry Point**: `main.py` (root) → `app/backend/app.py`
 
 ### 2. Frontend (React)
 - **Framework**: React with TypeScript
@@ -75,9 +76,8 @@ zara/
 
 2. **Configure Backend Service**
    ```
-   Build Command: pip install -r app/backend/requirements.txt
-   Start Command: gunicorn app.backend.main:app
-   Root Directory: app/backend
+   Build Command: pip install -r requirements.txt
+   Start Command: gunicorn main:app
    ```
 
 3. **Environment Variables**
@@ -101,7 +101,6 @@ zara/
    ```
    Build Command: cd app/frontend && npm install && npm run build
    Publish Directory: app/frontend/dist
-   Root Directory: app/frontend
    ```
 
 3. **Environment Variables**
@@ -154,19 +153,17 @@ services:
         sync: false
       - key: FLASK_ENV
         value: production
-    workingDir: app/backend
 
   # Frontend Static Site
   - type: web
     name: zara-frontend
     env: static
     plan: free
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    buildCommand: cd app/frontend && npm install && npm run build
+    staticPublishPath: app/frontend/dist
     envVars:
       - key: VITE_API_URL
         sync: false
-    workingDir: app/frontend
 ```
 
 ## Environment Variables Reference
