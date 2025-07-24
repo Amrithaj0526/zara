@@ -5,7 +5,7 @@ from app.backend.models.profile import Profile
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from markupsafe import escape
 from werkzeug.utils import secure_filename
-from PIL import Image
+# from PIL import Image  # Temporarily commented out for deployment
 import time
 import os
 
@@ -23,15 +23,19 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def compress_and_save_image(image, save_path):
-    img = Image.open(image)
-    img = img.convert('RGB')
-    img.save(save_path, optimize=True, quality=85)
+    # Temporarily disabled for deployment
+    # img = Image.open(image)
+    # img = img.convert('RGB')
+    # img.save(save_path, optimize=True, quality=85)
+    image.save(save_path)
     return save_path
 
 def create_thumbnail(image, thumb_path):
-    img = Image.open(image)
-    img.thumbnail(THUMBNAIL_SIZE)
-    img.save(thumb_path, optimize=True, quality=70)
+    # Temporarily disabled for deployment
+    # img = Image.open(image)
+    # img.thumbnail(THUMBNAIL_SIZE)
+    # img.save(thumb_path, optimize=True, quality=70)
+    image.save(thumb_path)
     return thumb_path
 
 def serialize_profile(profile):
@@ -208,7 +212,7 @@ def upload_profile_image():
         # Create thumbnail
         thumb_filename = f"thumb_{filename}"
         thumb_path = os.path.join(UPLOAD_FOLDER, thumb_filename)
-        create_thumbnail(save_path, thumb_path)
+        create_thumbnail(file, thumb_path)
     except Exception as e:
         print(f"Image processing error: {str(e)}")
         return jsonify({'message': 'Image processing failed'}), 500
