@@ -1,0 +1,40 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: zara-database
+    env: postgresql
+    plan: free
+    ipAllowList: []
+
+  # Backend API (Ultra Minimal)
+  - type: web
+    name: zara-backend
+    env: python
+    plan: free
+    buildCommand: pip install Flask Flask-SQLAlchemy Flask-JWT-Extended Flask-Cors psycopg2-binary gunicorn
+    startCommand: gunicorn main:app
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          name: zara-database
+          type: pserv
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: FLASK_ENV
+        value: production
+
+  # Frontend Static Site
+  - type: web
+    name: zara-frontend
+    env: static
+    plan: free
+    buildCommand: cd app/frontend && npm install && npm run build
+    staticPublishPath: app/frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false 
