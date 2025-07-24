@@ -6,13 +6,13 @@ services:
     plan: free
     ipAllowList: []
 
-  # Backend API (Minimal Dependencies)
+  # Backend API (Poetry)
   - type: web
     name: zara-backend
     env: python
     plan: free
-    buildCommand: pip install Flask Flask-SQLAlchemy Flask-Migrate Flask-JWT-Extended Flask-Cors python-dotenv Flask-Limiter psycopg2-binary gunicorn
-    startCommand: gunicorn main:app
+    buildCommand: poetry install --no-dev
+    startCommand: poetry run gunicorn main:app
     envVars:
       - key: DATABASE_URL
         fromService:
