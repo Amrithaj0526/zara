@@ -8,7 +8,7 @@ All errors have been fixed! Your app is now ready for deployment on Render.
 
 ```
 zara/
-├── app.py                    # ✅ SINGLE Flask app (working)
+├── main.py                   # ✅ SINGLE Flask app (working)
 ├── requirements.txt          # ✅ Python dependencies
 ├── render.yaml              # ✅ Render configuration
 ├── COMPLETE_DEPLOYMENT_GUIDE.md  # ✅ This guide
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ### **Start Command:**
 ```bash
-gunicorn app:app
+gunicorn main:app
 ```
 
 ## 🚀 **STEP-BY-STEP DEPLOYMENT:**
@@ -59,7 +59,7 @@ gunicorn app:app
    - **Environment**: Python
    - **Plan**: Free
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
+   - **Start Command**: `gunicorn main:app`
 6. Click **"Create Web Service"**
 
 ### **Step 3: Configure Environment Variables**
@@ -101,7 +101,7 @@ If you prefer manual deployment:
 2. Repository: `https://github.com/Amrithaj0526/zara`
 3. Branch: `final-deployment`
 4. Build Command: `pip install -r requirements.txt`
-5. Start Command: `gunicorn app:app`
+5. Start Command: `gunicorn main:app`
 6. Environment Variables:
    ```
    DATABASE_URL=postgresql://user:password@host:port/database
@@ -149,7 +149,7 @@ Visit your frontend URL and verify it loads correctly.
 
 - **Branch**: `final-deployment` ✅
 - **Latest Commit**: `dd4aa30` ✅
-- **App**: `app.py` (clean, tested, working) ✅
+- **App**: `main.py` (clean, tested, working) ✅
 - **Dependencies**: `requirements.txt` ✅
 - **Configuration**: `render.yaml` ✅
 - **Tested**: ✅ Working locally
@@ -158,7 +158,7 @@ Visit your frontend URL and verify it loads correctly.
 
 ## 🎉 **READY FOR DEPLOYMENT!**
 
-Your deployment will work perfectly! The import errors are completely resolved with a single, clean `app.py` file.
+Your deployment will work perfectly! The import errors are completely resolved with a single, clean `main.py` file.
 
 **Go ahead and deploy on Render - it will work!** 🚀
 
