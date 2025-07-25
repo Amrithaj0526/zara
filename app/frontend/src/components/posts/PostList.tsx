@@ -80,6 +80,21 @@ const PostList: React.FC = () => {
   const { user } = useAuth();
   const [myPostsOnly, setMyPostsOnly] = useState(false);
 
+  // Reset filters and load all posts
+  const loadAllPosts = () => {
+    setPage(1);
+    setSearch('');
+    setCategory('');
+    setTagsFilter([]);
+    setMyPostsOnly(false);
+    setOrder('desc');
+  };
+
+  // Load all posts on component mount
+  useEffect(() => {
+    loadAllPosts();
+  }, []);
+
   // Fetch posts with filters, sort, and pagination
   useEffect(() => {
     setLoading(true);
@@ -240,6 +255,11 @@ const PostList: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-10">
       <div className="max-w-2xl mx-auto space-y-8">
+        {/* Page Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">All Posts</h1>
+          <p className="text-gray-600">Discover and interact with posts from our community</p>
+        </div>
         {/* Filter/Search/Sort Bar */}
         <div className="flex flex-wrap gap-2 mb-6 items-center">
           <div className="flex items-center bg-white rounded-lg shadow px-3 py-2 gap-2">
@@ -267,16 +287,24 @@ const PostList: React.FC = () => {
             {order === 'asc' ? <FaSortAmountUp /> : <FaSortAmountDown />} {sort === 'created_at' ? 'Date' : sort.charAt(0).toUpperCase() + sort.slice(1)}
           </button>
         </div>
-        {/* My Posts Toggle */}
-        <div className="flex items-center gap-2 mb-2">
-          <input
-            type="checkbox"
-            id="my-posts-toggle"
-            checked={myPostsOnly}
-            onChange={e => { setMyPostsOnly(e.target.checked); setPage(1); }}
-            className="accent-blue-600"
-          />
-          <label htmlFor="my-posts-toggle" className="text-sm font-semibold text-blue-700 cursor-pointer">Show only my posts</label>
+        {/* Load All Posts Button */}
+        <div className="flex items-center gap-4 mb-4">
+          <button
+            onClick={loadAllPosts}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2"
+          >
+            🔄 Load All Posts
+          </button>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="my-posts-toggle"
+              checked={myPostsOnly}
+              onChange={e => { setMyPostsOnly(e.target.checked); setPage(1); }}
+              className="accent-blue-600"
+            />
+            <label htmlFor="my-posts-toggle" className="text-sm font-semibold text-blue-700 cursor-pointer">Show only my posts</label>
+          </div>
         </div>
         {/* Tag Filter Bar */}
         {popularTags.length > 0 && (
@@ -308,6 +336,14 @@ const PostList: React.FC = () => {
             ))}
           </div>
         )}
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="text-gray-600 mt-2">Loading posts...</p>
+          </div>
+        )}
+        
         {/* Post List */}
         {posts.length === 0 && !loading && !error && (
           <div className="text-center text-gray-500 text-lg">No posts found.</div>
