@@ -15,7 +15,7 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 import re
 from markupsafe import escape
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -71,7 +71,7 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     media_url = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     likes = db.Column(db.Integer, default=0)
     tags = db.Column(db.String(255))
     
@@ -232,6 +232,21 @@ def create_app():
             print("Profile update error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
+    @app.route('/profile/image', methods=['POST', 'OPTIONS'])
+    def upload_profile_image():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # Mock image upload response
+            return jsonify({
+                'message': 'Profile image uploaded successfully',
+                'image_url': '/uploads/profile_image.jpg'
+            }), 200
+        except Exception as e:
+            print("Profile image upload error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
     # Feed routes
     @app.route('/feed', methods=['GET', 'OPTIONS'])
     def get_feed():
@@ -246,7 +261,7 @@ def create_app():
                         'id': 1,
                         'content': 'This is a sample post',
                         'media_url': None,
-                        'created_at': datetime.utcnow().isoformat(),
+                        'created_at': datetime.now(timezone.utc).isoformat(),
                         'likes': 5,
                         'tags': ['sample', 'post'],
                         'user': {
@@ -264,6 +279,7 @@ def create_app():
     
     # Posts routes
     @app.route('/posts', methods=['GET', 'OPTIONS'])
+    @app.route('/posts/', methods=['GET', 'OPTIONS'])
     def list_posts():
         if request.method == 'OPTIONS':
             return '', 200
@@ -276,7 +292,7 @@ def create_app():
                         'id': 1,
                         'content': 'This is a sample post',
                         'media_url': None,
-                        'created_at': datetime.utcnow().isoformat(),
+                        'created_at': datetime.now(timezone.utc).isoformat(),
                         'likes': 5,
                         'tags': ['sample', 'post'],
                         'user': {
@@ -293,6 +309,7 @@ def create_app():
             return jsonify({'message': 'Internal server error'}), 500
     
     @app.route('/posts', methods=['POST', 'OPTIONS'])
+    @app.route('/posts/', methods=['POST', 'OPTIONS'])
     def create_post():
         if request.method == 'OPTIONS':
             return '', 200
@@ -307,7 +324,7 @@ def create_app():
                     'id': 1,
                     'content': content,
                     'media_url': None,
-                    'created_at': datetime.utcnow().isoformat(),
+                    'created_at': datetime.now(timezone.utc).isoformat(),
                     'likes': 0,
                     'tags': [],
                     'user': {
@@ -320,6 +337,20 @@ def create_app():
             }), 201
         except Exception as e:
             print("Post creation error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/posts/<int:post_id>/like', methods=['POST', 'OPTIONS'])
+    def like_post(post_id):
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            return jsonify({
+                'message': 'Post liked successfully',
+                'likes': 6
+            }), 200
+        except Exception as e:
+            print("Like post error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
     # Basic routes
