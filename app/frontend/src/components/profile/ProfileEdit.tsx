@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { profileApi } from './api';
 
 interface ProfileForm {
@@ -10,6 +11,7 @@ interface ProfileForm {
 }
 
 const ProfileEdit: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<ProfileForm>({
     bio: '',
     location: '',
@@ -82,7 +84,7 @@ const ProfileEdit: React.FC = () => {
         setImagePreview(res.image_url);
         setSuccess(true);
         setTimeout(() => {
-          window.location.href = '/profile';
+          navigate('/profile');
         }, 1500);
       } else {
         setImageUploadError(res?.message || 'Image upload failed');
@@ -104,7 +106,7 @@ const ProfileEdit: React.FC = () => {
       await profileApi.updateProfile(formData);
       setSuccess(true);
       setTimeout(() => {
-        window.location.href = '/profile';
+        navigate('/profile');
       }, 1500);
     } catch {
       setError('Failed to update profile');
@@ -119,7 +121,7 @@ const ProfileEdit: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Edit Profile</h1>
           <button 
-            onClick={() => window.location.href = '/profile'}
+            onClick={() => navigate('/profile')}
             className="text-gray-600 hover:text-gray-800 transition-colors"
           >
             ← Back to Profile

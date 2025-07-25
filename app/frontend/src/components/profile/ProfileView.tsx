@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { profileApi } from './api';
 import { FaUser, FaMapMarkerAlt, FaTools, FaBriefcase, FaGraduationCap, FaInfoCircle, FaEnvelope, FaGlobe, FaLinkedin, FaLanguage, FaUserFriends, FaCheckCircle, FaStar, FaAward, FaDownload, FaChartLine, FaCertificate, FaEdit } from 'react-icons/fa';
 import { motion } from 'framer-motion';
@@ -55,6 +56,7 @@ const demoStats = [
 type RequestInit = globalThis.RequestInit;
 
 const ProfileView: React.FC = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -233,7 +235,7 @@ const ProfileView: React.FC = () => {
             <div className="text-blue-600 text-lg font-semibold">Professional Headline or Role</div>
             <p className="text-gray-600 flex items-center gap-2"><FaMapMarkerAlt className="text-blue-300" /> {profile?.location || 'Location'}</p>
           </div>
-          <motion.button whileTap={{ scale: 0.97 }} onClick={() => window.location.href = '/profile/edit'} className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow font-semibold flex items-center gap-2">
+          <motion.button whileTap={{ scale: 0.97 }} onClick={() => navigate('/profile/edit')} className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow font-semibold flex items-center gap-2">
             <FaEdit /> Edit Profile
           </motion.button>
         </div>
