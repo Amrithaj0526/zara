@@ -12,7 +12,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn main:app
+    startCommand: gunicorn wsgi:application
     envVars:
       - key: DATABASE_URL
         fromService:
