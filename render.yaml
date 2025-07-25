@@ -12,7 +12,7 @@ services:
     env: python
     plan: free
     buildCommand: poetry install --no-dev
-    startCommand: poetry run gunicorn wsgi:application
+    startCommand: poetry run gunicorn flask_app:app
     envVars:
       - key: DATABASE_URL
         fromService:

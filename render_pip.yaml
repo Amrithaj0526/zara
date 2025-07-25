@@ -12,7 +12,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn wsgi:application
+    startCommand: gunicorn flask_app:app
     envVars:
       - key: DATABASE_URL
         fromService:
