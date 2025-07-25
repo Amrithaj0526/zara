@@ -277,6 +277,35 @@ def create_app():
             print("Feed error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
+    @app.route('/feed/user/<int:user_id>', methods=['GET', 'OPTIONS'])
+    def get_feed_by_user(user_id):
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # Return mock feed data for specific user
+            return jsonify({
+                'posts': [
+                    {
+                        'id': 1,
+                        'content': f'This is a sample post from user {user_id}',
+                        'media_url': None,
+                        'created_at': datetime.now(timezone.utc).isoformat(),
+                        'likes': 3,
+                        'tags': ['user', 'post'],
+                        'user': {
+                            'id': user_id,
+                            'name': f'User {user_id}',
+                            'avatar': None,
+                            'job_title': 'Developer'
+                        }
+                    }
+                ]
+            }), 200
+        except Exception as e:
+            print("Feed by user error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
     # Posts routes
     @app.route('/posts', methods=['GET', 'OPTIONS'])
     @app.route('/posts/', methods=['GET', 'OPTIONS'])
@@ -285,27 +314,93 @@ def create_app():
             return '', 200
         
         try:
-            # Return mock posts data
+            # Get query parameters
+            page = int(request.args.get('page', 1))
+            per_page = int(request.args.get('per_page', 10))
+            search = request.args.get('search', '')
+            category = request.args.get('category', '')
+            user_id = request.args.get('user_id', '')
+            
+            # Create mock posts data
+            posts = []
+            for i in range(1, 6):  # Create 5 sample posts
+                post_content = f'This is sample post {i}'
+                if search:
+                    post_content = f'This is sample post {i} with search: {search}'
+                
+                posts.append({
+                    'id': i,
+                    'content': post_content,
+                    'media_url': None,
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'likes': 5 + i,
+                    'tags': ['sample', 'post', f'tag{i}'],
+                    'user': {
+                        'id': i,
+                        'name': f'Sample User {i}',
+                        'avatar': None,
+                        'job_title': 'Developer'
+                    },
+                    'comments': [
+                        {
+                            'id': i,
+                            'user_id': i,
+                            'user_name': f'Commenter {i}',
+                            'user_avatar': None,
+                            'content': f'This is a sample comment {i}',
+                            'created_at': datetime.now(timezone.utc).isoformat()
+                        }
+                    ]
+                })
+            
+            # Filter by user_id if provided
+            if user_id:
+                posts = [post for post in posts if post['user']['id'] == int(user_id)]
+            
             return jsonify({
-                'posts': [
+                'posts': posts,
+                'total': len(posts),
+                'page': page,
+                'per_page': per_page,
+                'has_more': len(posts) >= per_page
+            }), 200
+        except Exception as e:
+            print("Posts list error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/posts/<int:post_id>', methods=['GET', 'OPTIONS'])
+    def get_post(post_id):
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # Return mock individual post data
+            return jsonify({
+                'id': post_id,
+                'content': f'This is detailed post {post_id}',
+                'media_url': None,
+                'created_at': datetime.now(timezone.utc).isoformat(),
+                'likes': 5 + post_id,
+                'tags': ['sample', 'post', f'tag{post_id}'],
+                'user': {
+                    'id': post_id,
+                    'name': f'Sample User {post_id}',
+                    'avatar': None,
+                    'job_title': 'Developer'
+                },
+                'comments': [
                     {
                         'id': 1,
-                        'content': 'This is a sample post',
-                        'media_url': None,
-                        'created_at': datetime.now(timezone.utc).isoformat(),
-                        'likes': 5,
-                        'tags': ['sample', 'post'],
-                        'user': {
-                            'id': 1,
-                            'name': 'Sample User',
-                            'avatar': None,
-                            'job_title': 'Developer'
-                        }
+                        'user_id': 1,
+                        'user_name': 'Commenter 1',
+                        'user_avatar': None,
+                        'content': f'This is a comment for post {post_id}',
+                        'created_at': datetime.now(timezone.utc).isoformat()
                     }
                 ]
             }), 200
         except Exception as e:
-            print("Posts list error:", e)
+            print("Get post error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
     @app.route('/posts', methods=['POST', 'OPTIONS'])
@@ -351,6 +446,28 @@ def create_app():
             }), 200
         except Exception as e:
             print("Like post error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/posts/categories', methods=['GET', 'OPTIONS'])
+    def get_categories():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            return jsonify(['Technology', 'Design', 'Business', 'Marketing', 'Development'])
+        except Exception as e:
+            print("Categories error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/posts/popular-tags', methods=['GET', 'OPTIONS'])
+    def get_popular_tags():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            return jsonify(['react', 'javascript', 'python', 'design', 'business', 'marketing', 'development', 'web', 'app', 'mobile'])
+        except Exception as e:
+            print("Popular tags error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
     # Basic routes
