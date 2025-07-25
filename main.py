@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 import re
 from markupsafe import escape
+from datetime import datetime
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +46,36 @@ class User(db.Model):
     def check_password(self, password):
         from werkzeug.security import check_password_hash
         return check_password_hash(self.password_hash, password)
+
+# Define Profile model
+class Profile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    bio = db.Column(db.Text)
+    location = db.Column(db.String(100))
+    skills = db.Column(db.Text)
+    experience = db.Column(db.Text)
+    education = db.Column(db.Text)
+    image = db.Column(db.String(255))
+    job_title = db.Column(db.String(100))
+    company = db.Column(db.String(100))
+    social_links = db.Column(db.Text)
+    
+    user = db.relationship('User', backref=db.backref('profile', uselist=False))
+
+# Define Post model
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    media_url = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    likes = db.Column(db.Integer, default=0)
+    tags = db.Column(db.String(255))
+    
+    user = db.relationship('User', backref=db.backref('posts', lazy=True))
 
 def create_app():
     app = Flask(__name__)
@@ -159,6 +190,136 @@ def create_app():
             
         except Exception as e:
             print("Login error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    # Profile routes
+    @app.route('/profile', methods=['GET', 'OPTIONS'])
+    @app.route('/profile/', methods=['GET', 'OPTIONS'])
+    def get_profile():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # For now, return a mock profile
+            return jsonify({
+                'id': 1,
+                'user_id': 1,
+                'bio': 'Default bio',
+                'location': 'Default location',
+                'skills': 'Default skills',
+                'experience': 'Default experience',
+                'education': 'Default education',
+                'image': None,
+                'user': {
+                    'username': 'default_user',
+                    'email': 'default@example.com'
+                }
+            }), 200
+        except Exception as e:
+            print("Profile get error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/profile', methods=['PUT', 'OPTIONS'])
+    @app.route('/profile/', methods=['PUT', 'OPTIONS'])
+    def update_profile():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            data = request.get_json()
+            return jsonify({'message': 'Profile updated successfully'}), 200
+        except Exception as e:
+            print("Profile update error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    # Feed routes
+    @app.route('/feed', methods=['GET', 'OPTIONS'])
+    def get_feed():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # Return mock feed data
+            return jsonify({
+                'posts': [
+                    {
+                        'id': 1,
+                        'content': 'This is a sample post',
+                        'media_url': None,
+                        'created_at': datetime.utcnow().isoformat(),
+                        'likes': 5,
+                        'tags': ['sample', 'post'],
+                        'user': {
+                            'id': 1,
+                            'name': 'Sample User',
+                            'avatar': None,
+                            'job_title': 'Developer'
+                        }
+                    }
+                ]
+            }), 200
+        except Exception as e:
+            print("Feed error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    # Posts routes
+    @app.route('/posts', methods=['GET', 'OPTIONS'])
+    def list_posts():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # Return mock posts data
+            return jsonify({
+                'posts': [
+                    {
+                        'id': 1,
+                        'content': 'This is a sample post',
+                        'media_url': None,
+                        'created_at': datetime.utcnow().isoformat(),
+                        'likes': 5,
+                        'tags': ['sample', 'post'],
+                        'user': {
+                            'id': 1,
+                            'name': 'Sample User',
+                            'avatar': None,
+                            'job_title': 'Developer'
+                        }
+                    }
+                ]
+            }), 200
+        except Exception as e:
+            print("Posts list error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/posts', methods=['POST', 'OPTIONS'])
+    def create_post():
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            data = request.get_json() if request.is_json else request.form
+            content = data.get('content', 'Sample post content')
+            
+            return jsonify({
+                'message': 'Post created successfully',
+                'post': {
+                    'id': 1,
+                    'content': content,
+                    'media_url': None,
+                    'created_at': datetime.utcnow().isoformat(),
+                    'likes': 0,
+                    'tags': [],
+                    'user': {
+                        'id': 1,
+                        'name': 'Sample User',
+                        'avatar': None,
+                        'job_title': 'Developer'
+                    }
+                }
+            }), 201
+        except Exception as e:
+            print("Post creation error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
     # Basic routes
