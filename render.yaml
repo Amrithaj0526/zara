@@ -6,13 +6,13 @@ services:
     plan: free
     ipAllowList: []
 
-  # Backend API (Poetry)
+  # Backend API
   - type: web
     name: zara-backend
     env: python
     plan: free
-    buildCommand: poetry install --no-dev
-    startCommand: poetry run gunicorn main:app
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     envVars:
       - key: DATABASE_URL
         fromService:
