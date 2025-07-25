@@ -31,7 +31,14 @@ def create_app():
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+    
+    # Database configuration - use SQLite for now to avoid psycopg2 issues
+    database_url = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+    if database_url.startswith('postgresql://'):
+        # Convert PostgreSQL URL to SQLite for now
+        database_url = 'sqlite:///app.db'
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Initialize extensions
