@@ -470,6 +470,63 @@ def create_app():
             print("Popular tags error:", e)
             return jsonify({'message': 'Internal server error'}), 500
     
+    @app.route('/posts/<int:post_id>/comments', methods=['GET', 'OPTIONS'])
+    def get_comments(post_id):
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            # Return mock comments for the post
+            comments = [
+                {
+                    'id': 1,
+                    'user_id': 1,
+                    'user_name': 'Commenter 1',
+                    'user_avatar': None,
+                    'content': f'This is a comment for post {post_id}',
+                    'created_at': datetime.now(timezone.utc).isoformat()
+                },
+                {
+                    'id': 2,
+                    'user_id': 2,
+                    'user_name': 'Commenter 2',
+                    'user_avatar': None,
+                    'content': f'Another comment for post {post_id}',
+                    'created_at': datetime.now(timezone.utc).isoformat()
+                }
+            ]
+            return jsonify(comments), 200
+        except Exception as e:
+            print("Get comments error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
+    @app.route('/posts/<int:post_id>/comments', methods=['POST', 'OPTIONS'])
+    def add_comment(post_id):
+        if request.method == 'OPTIONS':
+            return '', 200
+        
+        try:
+            data = request.get_json()
+            content = data.get('content', '')
+            
+            if not content:
+                return jsonify({'error': 'Comment content is required'}), 400
+            
+            # Return mock comment response
+            new_comment = {
+                'id': 3,
+                'user_id': 1,
+                'user_name': 'Current User',
+                'user_avatar': None,
+                'content': content,
+                'created_at': datetime.now(timezone.utc).isoformat()
+            }
+            
+            return jsonify(new_comment), 201
+        except Exception as e:
+            print("Add comment error:", e)
+            return jsonify({'message': 'Internal server error'}), 500
+    
     # Basic routes
     @app.route('/')
     def home():
